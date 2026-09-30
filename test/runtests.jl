@@ -104,6 +104,10 @@ using Test
             @test data_prox(ld, θhat, γ) ≈ θopt rtol = 1e-6
         end
         @test data_prox(ld, θhat, 1e-9) ≈ θhat rtol = 1e-6        # no trust in the data term
+        @test ld.s[1:m] ≈ svdvals(J) rtol = 1e-6
+        @test abs.(parameter_modes(ld, 4)' * svd(J).V[:, 1:4]) ≈ I atol = 1e-6   # right singular vectors
+        # from the Gram matrix directly (e.g. accumulated from row blocks)
+        @test data_prox(LinearizedData(J' * J, J' * r0, θ0, :gram; noise = 0.01), θhat, 0.1) ≈ data_prox(ld, θhat, 0.1)
         # batched: columns are independent
         Θ = θ0 .+ randn(rng, n, 3)
         @test data_prox(ld, Θ, 0.1) ≈ reduce(hcat, [data_prox(ld, Θ[:, k], 0.1) for k in 1:3])
@@ -127,8 +131,8 @@ using ModularEIT, Ferrite
     θ0 = ones(64)
     ld = LinearizedData(obj, θ0; noise)
     js = jacobian_svd(obj, θ0)
-    @test ld.s ≈ js.s
-    @test ld.r0 ≈ js.r
+    @test ld.s[1:length(js.s)] ≈ js.s atol = 1e-6 * js.s[1]
+    @test ld.g0 ≈ js.V * (js.s .* (js.U' * js.r))                   # Jᵀ r
     @test ld.η ≈ sqrt(2 * discrepancy_target(data, noise; τ = 1) / n_residual(data))
     # pixel images in the model range ↔ conductivities in (0.5, 1.5)
     dc = pixel_consistency(ld, pp; range = (0.5, 1.5), λ = 1.0)
@@ -143,7 +147,7 @@ using ModularEIT, Ferrite
     @test change(1.0f-4) < change(0.1f0) < change(1.0f0)
     @test change(1.0f-4) < 0.05 * norm(x0)
     # without clipping the linearized misfit decreases; with clipping the images stay in range
-    lin(x) = norm(ld.r0 + ld.J * (θx(x) - ld.θ0))
+    lin(x) = norm(js.r + js.U * (js.s .* (js.V' * (θx(x) - ld.θ0))))
     dcn = pixel_consistency(ld, pp; range = (0.5, 1.5), clip = false)
     @test lin(dcn(x0[:, :, :, 1:1], 1.0f0)[:, :, 1, 1]) < lin(x0[:, :, 1, 1])
     @test all(-1 .<= dc(x0, 1.0f0) .<= 1)

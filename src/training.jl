@@ -60,13 +60,26 @@ load_checkpoint(dir::AbstractString) =
     (JLD2.load(joinpath(dir, "ps_latestvn.jld2"), "ps_cpu"), JLD2.load(joinpath(dir, "st_latestvn.jld2"), "st_cpu"))
 
 """
-    pretrained_unet(name = "scenes_unet")
+    pretrained_unet(name = "scenes_unet"; image_size = nothing)
 
-A pretrained 64 × 64 U-Net from `pretrained/<name>`: `(model, ps, st)` on the CPU.
-`"tinyimagenet_unet"`: trained on TinyImageNet with rotations and flips; `"scenes_unet"`:
-fine-tuned from it on natural scenes with horizontal flips only.
+A pretrained U-Net from `pretrained/<name>`: `(model, ps, st)` on the CPU.
+`"tinyimagenet_unet"`: 64 × 64, trained on TinyImageNet with rotations and flips;
+`"scenes_unet"`: fine-tuned from it on natural scenes with horizontal flips only;
+`"scenes_unet_128"`: fine-tuned from `"scenes_unet"` at 128 × 128. Names ending in `_128` are
+built for 128 × 128 images, others for 64 × 64 (override with `image_size`).
 """
-function pretrained_unet(name::AbstractString = "scenes_unet")
+function pretrained_unet(name::AbstractString = "scenes_unet"; image_size = nothing)
     ps, st = load_checkpoint(joinpath(pkgdir(@__MODULE__), "pretrained", name))
-    return unet_tinyimagenet64(; embedding_dims = 32), ps, st
+    size_ = image_size === nothing ? (endswith(name, "_128") ? (128, 128) : (64, 64)) : Tuple(image_size)
+    return scene_unet(size_), ps, st
 end
+
+"""
+    scene_unet(image_size = (64, 64))
+
+The U-Net of the pretrained models for grayscale images of `image_size` (divisible by 8): four
+stages, 32–128 channels, attention at the bottleneck. Its parameters do not depend on the image
+size, so a model trained at 64 × 64 can be evaluated or fine-tuned at 128 × 128.
+"""
+scene_unet(image_size = (64, 64)) =
+    UNet(Tuple(image_size); channels = [32, 64, 96, 128], block_depth = 2, in_channels = 1, embedding_dims = 32)

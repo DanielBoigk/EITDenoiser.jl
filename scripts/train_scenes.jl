@@ -2,12 +2,17 @@
 # (Intel scene classification data, grayscale, 64 × 64), horizontal flips only. Image 1096,
 # the EIT test image, is excluded; 200 further images are held out for validation.
 #
-#     julia --project scripts/train_scenes.jl [steps] [image folder]
+#     julia --project scripts/train_scenes.jl [steps] [image folder] [initial model] [output] [batch size]
+# e.g. at 128 × 128, starting from the 64 × 64 scene model:
+#     julia --project scripts/train_scenes.jl 20000 ../Images/128 scenes_unet scenes_unet_128 48
 using EITDenoiser, Lux, Reactant, Random, Statistics, Printf, Dates
 
 steps = length(ARGS) >= 1 ? parse(Int, ARGS[1]) : 20_000
 folder = length(ARGS) >= 2 ? ARGS[2] : joinpath(@__DIR__, "..", "..", "Images", "64")
-out = joinpath(pkgdir(EITDenoiser), "pretrained", "scenes_unet")
+init = length(ARGS) >= 3 ? ARGS[3] : "tinyimagenet_unet"
+outname = length(ARGS) >= 4 ? ARGS[4] : "scenes_unet"
+batchsize = length(ARGS) >= 5 ? parse(Int, ARGS[5]) : 128
+out = joinpath(pkgdir(EITDenoiser), "pretrained", outname)
 
 X, names = load_image_folder(folder; exclude = ["1096"])
 rng = Xoshiro(2026)
@@ -16,7 +21,8 @@ val, train = perm[1:200], perm[201:end]
 Xtrain, Xval = X[:, :, :, train], X[:, :, :, val]
 @printf "%d training, %d validation images of size %s\n" size(Xtrain, 4) size(Xval, 4) string(size(X)[1:2])
 
-model, ps, st = pretrained_unet("tinyimagenet_unet")
+_, ps, st = pretrained_unet(init)
+model = scene_unet(size(X)[1:2])
 sch = VPSchedule()
 dev = reactant_device(; force = true)
 
@@ -45,7 +51,7 @@ function cb(step, loss, ts)
         save_checkpoint(out, cpu_device()(ts.parameters), cpu_device()(ts.states))
     end
 end
-ps, st, losses = train_noise_predictor(model, ps, st, Xtrain; steps, batchsize = 128, lr = 1.0f-4, schedule = sch,
+ps, st, losses = train_noise_predictor(model, ps, st, Xtrain; steps, batchsize, lr = 1.0f-4, schedule = sch,
                                        rng, device = dev, callback = cb)
 save_checkpoint(out, ps, st)
 @printf "validation loss after: %.5f\n" validation_loss(ps, st)

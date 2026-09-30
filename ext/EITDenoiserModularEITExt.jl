@@ -37,6 +37,7 @@ end
 
 function EITDenoiser.polish_sample(obj::ModularEIT.AbstractObjective, θ::AbstractVector; ftarget::Real,
                                    λ::Real = 1.0, maxiter::Integer = 20, lower = nothing, upper = nothing)
+    objective_value(obj, θ) <= ftarget && return Vector{Float64}(θ)   # (no Jacobian needed)
     res = minimize(obj, θ, GaussNewton(; scaling = :sensitivity, λ); lower, upper, maxiter, ftarget)
     return res.σ
 end

@@ -24,8 +24,8 @@ include("consistency.jl")
 export UNet, unet_tinyimagenet64, LocalScoreNet, local_score_net_64
 export VPSchedule, alpha_bar, diffuse, denoised_estimate, estimate_noise_level
 export load_image_folder, flip_augment, to_model_range, from_model_range
-export noisy_batch, train_noise_predictor, save_checkpoint, load_checkpoint, pretrained_unet
+export noisy_batch, train_noise_predictor, save_checkpoint, load_checkpoint, pretrained_unet, scene_unet
 export NoisePredictor, diffusion_sample, cpu_device, reactant_device
-export LinearizedData, data_prox, pixel_consistency, polish_sample
+export LinearizedData, data_prox, parameter_modes, pixel_consistency, polish_sample
 
 end
