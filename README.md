@@ -75,6 +75,19 @@ X = diffusion_sample(ε̂, VPSchedule(), x_ref; reference = x_ref, t_start = 0.5
                      consistency = dc)                   # one sample per column of x_ref
 ```
 
+## Theory
+
+The background lives in the [ModularEIT.jl wiki](https://danielboigk.github.io/ModularEIT.jl/dev/wiki/):
+[Diffusion Models](https://danielboigk.github.io/ModularEIT.jl/dev/wiki/12-Diffusion-Models/),
+[DiffPIR](https://danielboigk.github.io/ModularEIT.jl/dev/wiki/12-Diffusion-Models/DiffPIR) (with the linearized EIT data consistency used here),
+[Resolution and Confidence Maps](https://danielboigk.github.io/ModularEIT.jl/dev/wiki/08-Regularization/Resolution-and-Confidence-Maps),
+and on architectures for non-rectangular domains:
+[Networks on EIT Domains](https://danielboigk.github.io/ModularEIT.jl/dev/wiki/13-Geometric-Learning/Networks-on-EIT-Domains),
+[Masked and Partial Convolutions](https://danielboigk.github.io/ModularEIT.jl/dev/wiki/13-Geometric-Learning/Masked-and-Partial-Convolutions),
+[Conformal Transplantation of Networks](https://danielboigk.github.io/ModularEIT.jl/dev/wiki/13-Geometric-Learning/Conformal-Transplantation-of-Networks),
+[Graph Convolutions on Finite Element Meshes](https://danielboigk.github.io/ModularEIT.jl/dev/wiki/13-Geometric-Learning/Graph-Convolutions-on-Finite-Element-Meshes),
+[Diffusion Models on Finite Element Spaces](https://danielboigk.github.io/ModularEIT.jl/dev/wiki/12-Diffusion-Models/Diffusion-Models-on-Finite-Element-Spaces).
+
 ## Tests
 
 ```julia
