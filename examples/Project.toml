@@ -1,0 +1,9 @@
+[deps]
+CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
+EITDenoiser = "6a4c26a6-95b1-491c-aea0-8455def0751c"
+Ferrite = "c061ca5d-56c9-439f-9c0e-210fe06d3992"
+ModularEIT = "7608eb13-d8ec-417a-a672-b3f475c1af64"
+
+[sources]
+EITDenoiser = {path = ".."}
+ModularEIT = {url = "https://github.com/DanielBoigk/ModularEIT.jl", rev = "master"}
