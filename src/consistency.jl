@@ -84,13 +84,15 @@ Defined in the ModularEIT extension.
 function pixel_consistency end
 
 """
-    polish_sample(obj, θ; ftarget, λ = 1, maxiter = 20, lower = nothing, upper = nothing)
+    polish_sample(obj, θ; ftarget, λ = 1, maxiter = 20, lower = nothing, upper = nothing,
+                  linear_solver = :auto)
 
 Nonlinear correction of a sample `θ` (e.g. from [`diffusion_sample`](@ref) with linearized data
 consistency) until the misfit of the least-squares objective `obj` reaches `ftarget` (the
 discrepancy target): Levenberg–Marquardt with sensitivity damping and a *large* initial
 damping `λ` (relative), so that the correction is a small nudge along the data-determined
 directions. Weak damping would re-fit the data and destroy the texture of the sample. Samples
-that already fit are returned unchanged. Defined in the ModularEIT extension.
+that already fit are returned unchanged. `linear_solver = :cg` uses ModularEIT's matrix-free
+Gauss–Newton (for large problems). Defined in the ModularEIT extension.
 """
 function polish_sample end
