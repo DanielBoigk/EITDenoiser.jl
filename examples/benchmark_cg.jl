@@ -16,7 +16,7 @@ fit(θ) = objective_value(obj, θ) / target
 # values on the reconstruction model
 folder = length(ARGS) >= 1 ? ARGS[1] : joinpath(@__DIR__, "..", "..", "Images", "gray")
 levels = Float64[]
-for name in ("3", "500", "2500", "5000")
+for name in (get(ENV, "SKIP_LEVELS", "0") == "1" ? () : ("3", "500", "2500", "5000"))
     im = Float64.(gray.(jpeg_decode(Gray, joinpath(folder, name * ".jpg"))))
     ph = image_phantom(im, σrange...)
     Vf = simulate_data(fine, fm_fine, ph, t.currents).clean

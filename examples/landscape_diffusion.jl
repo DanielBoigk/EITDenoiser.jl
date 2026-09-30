@@ -10,12 +10,22 @@ BLAS.set_num_threads(Sys.CPU_THREADS)
 name = length(ARGS) >= 1 ? ARGS[1] : (N == 128 ? "scenes_unet_128" : "scenes_unet")
 data, noise_t, _, _ = landscape_objective()
 obj = ParametrizedObjective(data, pp)
-S = deserialize(joinpath(@__DIR__, "landscape_eit_$(N)_$(NEL).jls"))
-lo, hi = σrange
-m_res = size(S.J, 1)
-t_gram = @elapsed ld = LinearizedData(S.J, S.r, S.θlm; noise = S.η)  # Gram matrix JᵀJ, eigendecomposition
-S = (; S.θlm, S.target)                                        # release the Jacobian
+aem = get(ENV, "AEM", "0") == "1"
+if aem                                   # modelling error accounted for (landscape_aem.jl)
+    A = deserialize(joinpath(@__DIR__, "landscape_aem_$(N)_$(NEL).jls"))
+    obj = ApproximationErrorObjective(obj, A.ae)
+    t_gram = @elapsed ld = LinearizedData(A.G, A.g, A.θ, :gram; noise = 1.0)   # whitened: unit noise
+    S = (; θlm = A.θ, target = A.atarget)
+    A = nothing
+    m_res = n_residual(obj)
+else
+    S = deserialize(joinpath(@__DIR__, "landscape_eit_$(N)_$(NEL).jls"))
+    m_res = size(S.J, 1)
+    t_gram = @elapsed ld = LinearizedData(S.J, S.r, S.θlm; noise = S.η)  # Gram matrix JᵀJ, eigendecomposition
+    S = (; S.θlm, S.target)                                        # release the Jacobian
+end
 GC.gc()
+lo, hi = σrange
 @printf "Gram eigendecomposition for %d residuals × %d pixels: %.0f s\n" m_res N^2 t_gram
 flush(stdout)
 k = count(>=(1e-2 * ld.s[1]), ld.s)                     # resolution map: truncation at rtol = 1e-2
@@ -52,4 +62,4 @@ for (t_start, λ, ζ) in eval(Meta.parse(get(ENV, "GRID", "[(0.5, 1.0, 0.5)]")))
     flush(stdout)
     results[(t_start, λ, ζ)] = P
 end
-serialize(joinpath(@__DIR__, "landscape_diffusion_$(N)_$(NEL)_$(name).jls"), results)
+serialize(joinpath(@__DIR__, "landscape_diffusion_$(N)_$(NEL)_$(name)$(aem ? "_aem" : "").jls"), results)
