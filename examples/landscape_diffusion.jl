@@ -8,7 +8,7 @@ include(joinpath(@__DIR__, "landscape_setup.jl"))
 BLAS.set_num_threads(Sys.CPU_THREADS)
 
 name = length(ARGS) >= 1 ? ARGS[1] : (N == 128 ? "scenes_unet_128" : "scenes_unet")
-data, noise_t, _ = landscape_objective()
+data, noise_t, _, _ = landscape_objective()
 obj = ParametrizedObjective(data, pp)
 S = deserialize(joinpath(@__DIR__, "landscape_eit_$(N)_$(NEL).jls"))
 lo, hi = σrange

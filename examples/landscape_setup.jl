@@ -40,12 +40,12 @@ flush(stdout)
 function landscape_objective()
     data = AdjointStateObjective(fm, currents, sim.data)
     K = parse(Int, get(ENV, "KTRUNC", "0"))
-    K == 0 && return data, noise, nothing
+    K == 0 && return data, noise, nothing, nothing
     constant = ParametrizedObjective(data, SubspaceParametrization(pp, ones(N^2, 1)))
     c0 = minimize(constant, [0.5], LBFGS(); maxiter = 30).σ[1]    # gradient only: no Jacobian
     p = pattern_svd(disc, fm, currents, sim.data; metric = :L2, noise, reference = fill(c0, ndofs_σ(disc)))
     t = truncate_patterns(p, K; measurements = K)
     @printf "best constant %.4f; %d of %d pairs above 2× noise; kept %d × %d\n" c0 count(p.values .> 2 .* p.noise_levels) length(p.values) K K
     flush(stdout)
-    return AdjointStateObjective(fm, t.currents, t.voltages; misfit = ProjectedMisfit(t.projection)), t.noise, c0
+    return AdjointStateObjective(fm, t.currents, t.voltages; misfit = ProjectedMisfit(t.projection)), t.noise, c0, t
 end

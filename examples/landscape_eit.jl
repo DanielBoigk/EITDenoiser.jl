@@ -6,7 +6,7 @@ using Serialization, Statistics
 include(joinpath(@__DIR__, "landscape_setup.jl"))
 BLAS.set_num_threads(Sys.CPU_THREADS)
 
-data, noise_t, c0 = landscape_objective()
+data, noise_t, c0, _ = landscape_objective()
 obj = ParametrizedObjective(data, pp)
 target = discrepancy_target(data, noise_t)
 relerr(θ) = norm(θ - truth) / norm(truth .- mean(truth))
