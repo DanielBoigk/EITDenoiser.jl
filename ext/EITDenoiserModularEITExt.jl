@@ -35,4 +35,10 @@ function EITDenoiser.pixel_consistency(ld::LinearizedData, pixels::ModularEIT.Pi
     end
 end
 
+function EITDenoiser.polish_sample(obj::ModularEIT.AbstractObjective, θ::AbstractVector; ftarget::Real,
+                                   λ::Real = 1.0, maxiter::Integer = 20, lower = nothing, upper = nothing)
+    res = minimize(obj, θ, GaussNewton(; scaling = :sensitivity, λ); lower, upper, maxiter, ftarget)
+    return res.σ
+end
+
 end

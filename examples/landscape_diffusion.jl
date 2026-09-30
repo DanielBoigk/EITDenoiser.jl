@@ -31,7 +31,11 @@ for (t_start, λ, ζ) in eval(Meta.parse(get(ENV, "GRID", "[(0.5, 1.0, 0.5)]")))
     Θ = [to_θ(X[:, :, 1, b]) for b in 1:B]
     μ = mean(Θ)
     errs, fits = relerr.(Θ), misfit.(Θ)
-    @printf "t_start %.2f λ %.1f ζ %.1f: sample err %.3f ± %.3f, mean err %.3f, misfit/target %.1f–%.1f (mean %.1f) [%.0f s]\n" t_start λ ζ mean(errs) std(errs) relerr(μ) minimum(fits) maximum(fits) misfit(μ) t
+    @printf "t_start %.2f λ %.1f ζ %.1f: sample err %.3f ± %.3f, mean err %.3f, misfit/target %.2f–%.2f (mean %.2f) [%.0f s]\n" t_start λ ζ mean(errs) std(errs) relerr(μ) minimum(fits) maximum(fits) misfit(μ) t
+    # nonlinear polish: a strongly damped correction of every sample to the noise level
+    t = @elapsed P = [polish_sample(S.obj, θ; ftarget = S.target, lower = 0.05) for θ in Θ]
+    @printf "    polished: sample err %.3f ± %.3f, mean err %.3f, misfit/target %.2f–%.2f, change %.3f [%.0f s]\n" mean(relerr.(P)) std(relerr.(P)) relerr(mean(P)) extrema(misfit.(P))... mean(norm.(P .- Θ) ./ norm.(Θ)) t
     results[(t_start, λ, ζ)] = X
+    results[(:polished, t_start, λ, ζ)] = P
 end
 serialize(joinpath(@__DIR__, "landscape_diffusion_$(name).jls"), results)

@@ -13,7 +13,7 @@ Diffusion-model priors for electrical impedance tomography, as a companion to
 - **Sampling** (`diffusion_sample`, `NoisePredictor`): reverse diffusion (DDIM with a fraction `ζ`
   of fresh noise per step), started from pure noise or from a noised reference image (SDEdit),
   with an optional data-consistency step after every clean-image estimate (DiffPIR).
-- **EIT data consistency** (`LinearizedData`, `data_prox`, `pixel_consistency`): the EIT
+- **EIT data consistency** (`LinearizedData`, `data_prox`, `pixel_consistency`, `polish_sample`): the EIT
   residual linearized at a reconstruction, `r(θ) ≈ r₀ + J (θ - θ₀)`, and its proximal step via
   the SVD of `J`. Directions the data determine are taken from the data, the others from the
   prior. That is the confidence weighting of ModularEIT's `resolution_map`, applied in every
@@ -59,6 +59,13 @@ outline of the ridge. Their standard deviation marks that band. Each sample fits
 EIT data at the noise level, although the sampler only uses the data linearized at the
 reconstruction. Individual samples carry texture and therefore have a larger L² error than
 smooth estimates; the posterior mean is slightly better than the reconstruction it started from.
+
+**Nonlinear polish.** `polish_sample` corrects a sample with the full nonlinear forward model until
+it fits the data at the noise level. With the default weighting the samples already fit and it
+leaves them unchanged. With a stronger data weight (`λ = 3`) the samples end slightly above the
+target (1.00–1.22) and the polish moves them by 0.5 % to the target, without changing their
+error (0.175 → 0.176). This works only with strong initial damping: nearly undamped Gauss–Newton
+steps re-fit the data in poorly determined directions and nearly double the error (0.175 → 0.32).
 
 Unconditional samples of the two priors (top: TinyImageNet, rotated objects; bottom: fine-tuned on
 natural scenes, upright landscapes):

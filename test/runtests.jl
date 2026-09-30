@@ -147,4 +147,16 @@ using ModularEIT, Ferrite
     dcn = pixel_consistency(ld, pp; range = (0.5, 1.5), clip = false)
     @test lin(dcn(x0[:, :, :, 1:1], 1.0f0)[:, :, 1, 1]) < lin(x0[:, :, 1, 1])
     @test all(-1 .<= dc(x0, 1.0f0) .<= 1)
+
+    # polishing: a strongly damped nonlinear correction to the noise level, small changes only
+    target = discrepancy_target(data, noise)
+    θfit = minimize(obj, θ0, GaussNewton(; scaling = :sensitivity); lower = 0.1, ftarget = target).σ
+    @test polish_sample(obj, θfit; ftarget = target) == θfit              # already consistent: unchanged
+    θoff = θfit .+ 0.05 .* randn(rng, 64)
+    objective_value(obj, θoff) > target || (θoff .+= 0.1 .* randn(rng, 64))
+    @test objective_value(obj, θoff) > target
+    θp = polish_sample(obj, θoff; ftarget = target, lower = 0.1)
+    @test objective_value(obj, θp) <= target
+    @test norm(θp - θoff) < norm(θoff - θfit)                             # a nudge, not a new fit
+    @test all(θp .>= 0.1)
 end

@@ -3,7 +3,7 @@
 using ModularEIT, Ferrite, Serialization, CairoMakie, Statistics
 S = deserialize(joinpath(@__DIR__, "landscape_eit.jls"))
 R = deserialize(ARGS[1])
-keys_ = sort(collect(keys(R)))
+keys_ = sort(filter(k -> !(first(k) isa Symbol), collect(keys(R))))
 key = keys_[length(ARGS) >= 3 ? parse(Int, ARGS[3]) : 1]
 X = R[key]
 lo, hi = S.σrange
