@@ -38,11 +38,11 @@ atarget = discrepancy_target(aobj)
 @printf "misfit/target of the true image: plain %.2f, with the modelling error %.2f\n" objective_value(obj, truth) / target objective_value(aobj, truth) / atarget
 flush(stdout)
 
-# Stopping: STOP=target (default) at FTARGET × the discrepancy target; STOP=significance when a
+# Stopping: STOP=target at FTARGET × the discrepancy target; STOP=significance (default) when a
 # step lowers the whitened misfit by less than KAPPA (default 3) standard deviations √(m/2) of
 # its noise-only value (χ²_m / 2), returning the iterate before that step: LM with the modelling
 # error is semi-convergent, and once the misfit stalls the steps fit noise.
-significance = get(ENV, "STOP", "target") == "significance"
+significance = get(ENV, "STOP", "significance") == "significance"
 κ = parse(Float64, get(ENV, "KAPPA", "3"))
 δJ = κ * sqrt(n_residual(aobj) / 2)
 prev = Ref{Any}(nothing)
