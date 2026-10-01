@@ -3,6 +3,8 @@
 # matrix-free Levenberg–Marquardt on the corrected misfit, and the Gram matrix of its Jacobian
 # for the diffusion step (landscape_diffusion.jl with AEM=1).
 #     N=128 NEL=255 KTRUNC=128 NSAMPLES=200 julia --project=. -t 8 landscape_aem.jl [image folder]
+# FTARGET: stop at this multiple of the discrepancy target (default 1, 0: never), MAXITER (default
+# 40); TAG is appended to the output name (landscape_diffusion.jl with AEM=1 and the same TAG).
 using Serialization, Statistics, Random, JpegTurbo, ColorTypes
 include(joinpath(@__DIR__, "landscape_setup.jl"))
 BLAS.set_num_threads(Sys.CPU_THREADS)
@@ -41,10 +43,11 @@ function record(st)
     flush(stdout)
     return false
 end
+τ = parse(Float64, get(ENV, "FTARGET", "1"))
 res = minimize(aobj, fill(c0, N^2), GaussNewton(; scaling = :sensitivity, linear_solver = :cg); lower = 0.05,
-               maxiter = 40, ftarget = atarget, callback = record)
+               maxiter = parse(Int, get(ENV, "MAXITER", "40")), ftarget = τ * atarget, callback = record)
 @printf "LM with the modelling error: %d its, %s, %.0f s, rel. error %.3f\n" res.iteration res.status time() - t0 relerr(res.σ)
 flush(stdout)
 tg = @elapsed G, g = jacobian_gram(aobj, res.σ)
 @printf "Gram matrix: %.0f s\n" tg
-serialize(joinpath(@__DIR__, "landscape_aem_$(N)_$(NEL).jls"), (; θ = res.σ, G, g, ae, atarget, chosen))
+serialize(joinpath(@__DIR__, "landscape_aem_$(N)_$(NEL)$(get(ENV, "TAG", "")).jls"), (; θ = res.σ, G, g, ae, atarget, chosen))

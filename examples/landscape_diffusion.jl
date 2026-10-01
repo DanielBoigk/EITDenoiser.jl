@@ -12,7 +12,7 @@ data, noise_t, _, _ = landscape_objective()
 obj = ParametrizedObjective(data, pp)
 aem = get(ENV, "AEM", "0") == "1"
 if aem                                   # modelling error accounted for (landscape_aem.jl)
-    A = deserialize(joinpath(@__DIR__, "landscape_aem_$(N)_$(NEL).jls"))
+    A = deserialize(joinpath(@__DIR__, "landscape_aem_$(N)_$(NEL)$(get(ENV, "TAG", "")).jls"))
     obj = ApproximationErrorObjective(obj, A.ae)
     t_gram = @elapsed ld = LinearizedData(A.G, A.g, A.θ, :gram; noise = 1.0)   # whitened: unit noise
     S = (; θlm = A.θ, target = A.atarget)
@@ -62,4 +62,4 @@ for (t_start, λ, ζ) in eval(Meta.parse(get(ENV, "GRID", "[(0.5, 1.0, 0.5)]")))
     flush(stdout)
     results[(t_start, λ, ζ)] = P
 end
-serialize(joinpath(@__DIR__, "landscape_diffusion_$(N)_$(NEL)_$(name)$(aem ? "_aem" : "").jls"), results)
+serialize(joinpath(@__DIR__, "landscape_diffusion_$(N)_$(NEL)_$(name)$(aem ? "_aem" * get(ENV, "TAG", "") : "").jls"), results)
