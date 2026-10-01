@@ -22,20 +22,26 @@ Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 
 [weakdeps]
 ModularEIT = "7608eb13-d8ec-417a-a672-b3f475c1af64"
+ModularEITFerrite = "4e1b8f0b-f07f-4a56-87d6-d07522e0b7e4"
 
 [sources]
+Ferrite = {rev = "adaptive-triangular", url = "https://github.com/DanielBoigk/Ferrite.jl"}
+Krylov = {rev = "block-cg", url = "https://github.com/DanielBoigk/Krylov.jl"}
 ModularEIT = {rev = "master", url = "https://github.com/DanielBoigk/ModularEIT.jl"}
+ModularEITFerrite = {rev = "master", subdir = "lib/ModularEITFerrite", url = "https://github.com/DanielBoigk/ModularEIT.jl"}
 
 [extensions]
-EITDenoiserModularEITExt = "ModularEIT"
+EITDenoiserModularEITExt = ["ModularEIT", "ModularEITFerrite"]
 
 [compat]
 MLDataDevices = "1.17.10"
 
 [extras]
 Ferrite = "c061ca5d-56c9-439f-9c0e-210fe06d3992"
+Krylov = "ba0b0d4f-ebba-5204-a429-3ac8c609bfb7"
 ModularEIT = "7608eb13-d8ec-417a-a672-b3f475c1af64"
+ModularEITFerrite = "4e1b8f0b-f07f-4a56-87d6-d07522e0b7e4"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
-test = ["Test", "ModularEIT", "Ferrite"]
+test = ["Test", "ModularEIT", "ModularEITFerrite", "Ferrite", "Krylov"]

@@ -1,6 +1,6 @@
 module EITDenoiserModularEITExt
 
-using EITDenoiser, ModularEIT
+using EITDenoiser, ModularEIT, ModularEITFerrite
 
 """
     LinearizedData(obj, θ0; noise)
@@ -16,7 +16,7 @@ function EITDenoiser.LinearizedData(obj::ModularEIT.AbstractObjective, θ0::Abst
     return LinearizedData(J, r, θ0; noise = ModularEIT._residual_noise_std(obj, noise))
 end
 
-function EITDenoiser.pixel_consistency(ld::LinearizedData, pixels::ModularEIT.PixelParametrization; range,
+function EITDenoiser.pixel_consistency(ld::LinearizedData, pixels::ModularEITFerrite.PixelParametrization; range,
                                        λ::Real = 1.0, schedule::VPSchedule = VPSchedule(), clip::Bool = true)
     lo, hi = Float64.(Tuple(range))
     n, m = pixels.n, pixels.m

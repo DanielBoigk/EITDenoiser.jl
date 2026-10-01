@@ -1,6 +1,6 @@
 # Figure: truth, LM, posterior mean and std, and individual samples, for one setting of
 # landscape_diffusion.jl.   julia --project=. plot_diffusion.jl <results.jls> <out.png> [key index]
-using ModularEIT, Ferrite, Serialization, CairoMakie, Statistics
+using ModularEIT, ModularEITFerrite, Ferrite, Serialization, CairoMakie, Statistics
 S = deserialize(joinpath(@__DIR__, "landscape_eit.jls"))
 R = deserialize(ARGS[1])
 keys_ = sort(filter(k -> !(first(k) isa Symbol), collect(keys(R))))

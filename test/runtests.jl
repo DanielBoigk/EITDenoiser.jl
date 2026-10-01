@@ -117,7 +117,7 @@ using Test
     end
 end
 
-using ModularEIT, Ferrite
+using ModularEIT, ModularEITFerrite, Ferrite
 @testset "ModularEIT extension" begin
     rng = Xoshiro(11)
     disc = FerriteDiscretization(generate_grid(Quadrilateral, (8, 8)))

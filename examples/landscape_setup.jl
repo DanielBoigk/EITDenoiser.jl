@@ -1,7 +1,7 @@
 # Shared setup of the landscape showcase: the image as conductivity, the reconstruction mesh
 # (N × N squares, boundary layer refined twice), NEL electrodes, data from a finer mesh with 1 %
 # noise, and the pixel parametrisation. Environment: N (default 64), NEL (default 32).
-using ModularEIT, Ferrite, Random, LinearAlgebra, Printf
+using ModularEIT, ModularEITFerrite, Ferrite, Random, LinearAlgebra, Printf
 
 N = parse(Int, get(ENV, "N", "64"))
 NEL = parse(Int, get(ENV, "NEL", "32"))

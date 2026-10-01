@@ -1,6 +1,6 @@
 # Figure of the diffusion showcase: truth, LM, posterior mean and std, samples, resolution map.
 #     julia --project=. plot_showcase.jl <results.jls> <out.png> [key index]
-using ModularEIT, Ferrite, Serialization, CairoMakie, Statistics
+using ModularEIT, ModularEITFerrite, Ferrite, Serialization, CairoMakie, Statistics
 R = deserialize(ARGS[1])
 keys_ = sort(filter(k -> k isa Tuple, collect(keys(R))))
 key = keys_[length(ARGS) >= 3 ? parse(Int, ARGS[3]) : 1]
