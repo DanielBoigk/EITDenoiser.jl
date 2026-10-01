@@ -4,9 +4,11 @@ ColorTypes = "3da002f7-5984-5a60-b8a6-cbb66c0b333f"
 EITDenoiser = "6a4c26a6-95b1-491c-aea0-8455def0751c"
 Ferrite = "c061ca5d-56c9-439f-9c0e-210fe06d3992"
 JpegTurbo = "b835a17e-a41a-41e7-81f0-2f016b05efe0"
+Krylov = "ba0b0d4f-ebba-5204-a429-3ac8c609bfb7"
 ModularEIT = "7608eb13-d8ec-417a-a672-b3f475c1af64"
 
 [sources]
+Krylov = {url = "https://github.com/DanielBoigk/Krylov.jl", rev = "block-cg"}
 Ferrite = {url = "https://github.com/DanielBoigk/Ferrite.jl", rev = "adaptive-triangular"}
 EITDenoiser = {path = ".."}
 ModularEIT = {rev = "master", url = "https://github.com/DanielBoigk/ModularEIT.jl"}
