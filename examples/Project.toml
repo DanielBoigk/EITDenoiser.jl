@@ -7,5 +7,6 @@ JpegTurbo = "b835a17e-a41a-41e7-81f0-2f016b05efe0"
 ModularEIT = "7608eb13-d8ec-417a-a672-b3f475c1af64"
 
 [sources]
+Ferrite = {url = "https://github.com/DanielBoigk/Ferrite.jl", rev = "adaptive-triangular"}
 EITDenoiser = {path = ".."}
 ModularEIT = {rev = "master", url = "https://github.com/DanielBoigk/ModularEIT.jl"}
